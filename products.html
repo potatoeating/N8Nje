@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Templates - N8N Hub</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-logo">
+                <i class="fas fa-network-wired"></i>
+                <span>N8N Hub</span>
+            </a>
+            
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html" class="active">Templates</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            
+            <div class="navbar-actions">
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <a href="login.html" class="btn btn-primary btn-sm" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span>Sign In</span>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="hero" style="padding: 2rem 0;">
+        <div class="container">
+            <div class="hero-content">
+                <h1 style="font-size: 2.5rem;">Browse Templates</h1>
+                <p>Discover powerful n8n workflow templates to automate your business</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="categoryFilter">Category</label>
+                    <select id="categoryFilter" class="form-control">
+                        <option value="">All Categories</option>
+                        <option value="AI Automation">AI Automation</option>
+                        <option value="Marketing Automation">Marketing Automation</option>
+                        <option value="CRM Integration">CRM Integration</option>
+                        <option value="Data Processing">Data Processing</option>
+                        <option value="Social Media Automation">Social Media Automation</option>
+                        <option value="Email Automation">Email Automation</option>
+                        <option value="Lead Generation">Lead Generation</option>
+                        <option value="Reporting & Analytics">Reporting & Analytics</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="sortFilter">Sort By</label>
+                    <select id="sortFilter" class="form-control">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="searchFilter">Search</label>
+                    <input type="text" id="searchFilter" class="form-control" placeholder="Search templates...">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Grid -->
+    <section class="products">
+        <div class="container">
+            <div id="productsCount" style="margin-bottom: 1.5rem; color: var(--text-gray); font-size: 0.875rem;"></div>
+            
+            <div class="products-grid" id="productsGrid">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-network-wired"></i> N8N Hub</h3>
+                    <p>Your trusted marketplace for premium n8n workflow automation templates.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Templates</a>
+                    <a href="about.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <a href="terms.html">Terms of Service</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Payment</h3>
+                    <p>We accept USDT (TRC20/ERC20) cryptocurrency payments.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 N8N Hub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let allProducts = [];
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadProducts();
+            
+            // Set up filters
+            document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+            document.getElementById('sortFilter').addEventListener('change', filterProducts);
+            document.getElementById('searchFilter').addEventListener('input', filterProducts);
+            
+            // Check URL params for category
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            if (category) {
+                document.getElementById('categoryFilter').value = category;
+                filterProducts();
+            }
+        });
+
+        async function loadProducts() {
+            try {
+                const response = await fetch('tables/products?limit=100');
+                const data = await response.json();
+                
+                if (data.data && data.data.length > 0) {
+                    allProducts = data.data;
+                    displayProducts(allProducts);
+                } else {
+                    document.getElementById('productsGrid').innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-box-open"></i>
+                            <h3>No Templates Available Yet</h3>
+                            <p>Check back soon for amazing automation templates!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productsGrid').innerHTML = `
+                    <div class="alert alert-error" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Failed to load templates. Please try again later.</span>
+                    </div>
+                `;
+            }
+        }
+
+        function filterProducts() {
+            const category = document.getElementById('categoryFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            const search = document.getElementById('searchFilter').value.toLowerCase();
+            
+            let filtered = [...allProducts];
+            
+            // Filter by category
+            if (category) {
+                filtered = filtered.filter(p => p.category === category);
+            }
+            
+            // Filter by search
+            if (search) {
+                filtered = filtered.filter(p => 
+                    p.title.toLowerCase().includes(search) ||
+                    p.description.toLowerCase().includes(search) ||
+                    p.category.toLowerCase().includes(search)
+                );
+            }
+            
+            // Sort
+            switch(sort) {
+                case 'price-low':
+                    filtered.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    filtered.sort((a, b) => b.price - a.price);
+                    break;
+                case 'rating':
+                    filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                    break;
+                case 'newest':
+                    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    break;
+                case 'featured':
+                    filtered.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+                    break;
+            }
+            
+            displayProducts(filtered);
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('productsGrid');
+            const countElement = document.getElementById('productsCount');
+            
+            countElement.textContent = `Showing ${products.length} template${products.length !== 1 ? 's' : ''}`;
+            
+            if (products.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-search"></i>
+                        <h3>No Templates Found</h3>
+                        <p>Try adjusting your filters or search terms</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div style="position: relative;">
+                        <img src="${product.image || 'https://via.placeholder.com/400x200?text=N8N+Template'}" alt="${product.title}" class="product-image">
+                        ${product.featured ? '<span class="product-badge">Featured</span>' : ''}
+                    </div>
+                    <div class="product-content">
+                        <span class="product-category">${product.category}</span>
+                        <h3 class="product-title">${product.title}</h3>
+                        <p class="product-description">${product.shortDescription || product.description.substring(0, 100) + '...'}</p>
+                        <div class="product-rating">
+                            <span class="stars">${getStarRating(product.rating || 5)}</span>
+                            <span class="rating-count">(${product.reviewCount || 0} reviews)</span>
+                        </div>
+                        <div class="product-footer">
+                            <div class="product-price">
+                                ${product.price} <span>USDT</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="viewProduct('${product.id}')">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+            let stars = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+            
+            return stars;
+        }
+
+        function viewProduct(productId) {
+            window.location.href = `product-detail.html?id=${productId}`;
+        }
+    </script>
+</body>
+</html>

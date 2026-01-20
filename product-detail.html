@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - N8N Hub</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <style>
+        .product-detail-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        
+        .product-detail-image {
+            width: 100%;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .product-detail-info h1 {
+            margin-bottom: 1rem;
+        }
+        
+        .product-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .product-price-large {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--bg-gray);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .features-list li i {
+            color: var(--success-green);
+        }
+        
+        .reviews-section {
+            margin-top: 3rem;
+        }
+        
+        .review-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .reviewer-info h5 {
+            margin-bottom: 0.25rem;
+        }
+        
+        .review-date {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+        
+        @media (max-width: 768px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .product-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-logo">
+                <i class="fas fa-network-wired"></i>
+                <span>N8N Hub</span>
+            </a>
+            
+            <ul class="navbar-menu" id="navbarMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html" class="active">Templates</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            
+            <div class="navbar-actions">
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+                <a href="login.html" class="btn btn-primary btn-sm" id="authBtn">
+                    <i class="fas fa-user"></i>
+                    <span>Sign In</span>
+                </a>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Product Detail -->
+    <section class="products">
+        <div class="container">
+            <div id="productDetail">
+                <div class="spinner"></div>
+            </div>
+            
+            <!-- Reviews Section -->
+            <div id="reviewsSection" class="reviews-section" style="display: none;">
+                <h2>Customer Reviews</h2>
+                <div id="reviewsList"></div>
+                
+                <div id="reviewFormSection" style="display: none; margin-top: 2rem;">
+                    <h3>Write a Review</h3>
+                    <div class="card">
+                        <form id="reviewForm">
+                            <div class="form-group">
+                                <label>Rating</label>
+                                <div style="font-size: 2rem; color: #FCD34D;">
+                                    <i class="far fa-star" data-rating="1" onclick="setRating(1)"></i>
+                                    <i class="far fa-star" data-rating="2" onclick="setRating(2)"></i>
+                                    <i class="far fa-star" data-rating="3" onclick="setRating(3)"></i>
+                                    <i class="far fa-star" data-rating="4" onclick="setRating(4)"></i>
+                                    <i class="far fa-star" data-rating="5" onclick="setRating(5)"></i>
+                                </div>
+                                <input type="hidden" id="rating" value="5">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reviewComment">Your Review</label>
+                                <textarea id="reviewComment" class="form-control" rows="5" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i>
+                                Submit Review
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-network-wired"></i> N8N Hub</h3>
+                    <p>Your trusted marketplace for premium n8n workflow automation templates.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Templates</a>
+                    <a href="about.html">About Us</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <a href="terms.html">Terms of Service</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Payment</h3>
+                    <p>We accept USDT (TRC20/ERC20) cryptocurrency payments.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 N8N Hub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentProduct = null;
+        let selectedRating = 5;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            if (!productId) {
+                window.location.href = 'products.html';
+                return;
+            }
+            
+            await loadProduct(productId);
+            await loadReviews(productId);
+            
+            // Set up review form
+            const reviewForm = document.getElementById('reviewForm');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', handleReviewSubmit);
+            }
+        });
+
+        async function loadProduct(productId) {
+            try {
+                const product = await getProduct(productId);
+                currentProduct = product;
+                displayProduct(product);
+            } catch (error) {
+                console.error('Error loading product:', error);
+                document.getElementById('productDetail').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Product not found</span>
+                    </div>
+                `;
+            }
+        }
+
+        function displayProduct(product) {
+            const container = document.getElementById('productDetail');
+            
+            container.innerHTML = `
+                <div class="product-detail-container">
+                    <div>
+                        <img src="${product.image || 'https://via.placeholder.com/600x400?text=N8N+Template'}" alt="${product.title}" class="product-detail-image">
+                    </div>
+                    
+                    <div class="product-detail-info">
+                        <span class="product-category">${product.category}</span>
+                        <h1>${product.title}</h1>
+                        
+                        <div class="product-meta">
+                            <div class="product-rating">
+                                <span class="stars" style="font-size: 1.25rem;">${getStarRating(product.rating || 5)}</span>
+                                <span class="rating-count" style="font-size: 1rem;">(${product.reviewCount || 0} reviews)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="product-price-large">
+                            ${product.price} <span style="font-size: 1.5rem; color: var(--text-gray);">USDT</span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="btn btn-primary btn-lg" onclick="handleAddToCart()">
+                                <i class="fas fa-shopping-cart"></i>
+                                Add to Cart
+                            </button>
+                            <button class="btn btn-secondary btn-lg" onclick="buyNow()">
+                                <i class="fas fa-bolt"></i>
+                                Buy Now
+                            </button>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>Description</h3>
+                            <p>${product.description}</p>
+                        </div>
+                        
+                        ${product.features && product.features.length > 0 ? `
+                        <div class="card" style="margin-top: 1.5rem;">
+                            <h3>Key Features</h3>
+                            <ul class="features-list">
+                                ${product.features.map(feature => `
+                                    <li><i class="fas fa-check-circle"></i> ${feature}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                        
+                        ${product.whatYouGet && product.whatYouGet.length > 0 ? `
+                        <div class="card" style="margin-top: 1.5rem;">
+                            <h3>What You Get</h3>
+                            <ul class="features-list">
+                                ${product.whatYouGet.map(item => `
+                                    <li><i class="fas fa-gift"></i> ${item}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadReviews(productId) {
+            try {
+                const reviews = await getProductReviews(productId);
+                const reviewsSection = document.getElementById('reviewsSection');
+                const reviewsList = document.getElementById('reviewsList');
+                
+                reviewsSection.style.display = 'block';
+                
+                if (reviews.length === 0) {
+                    reviewsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-star"></i>
+                            <h3>No Reviews Yet</h3>
+                            <p>Be the first to review this template!</p>
+                        </div>
+                    `;
+                } else {
+                    reviewsList.innerHTML = reviews.map(review => `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <h5>${review.userName}</h5>
+                                    <div class="stars" style="color: #FCD34D; font-size: 1rem;">${getStarRating(review.rating)}</div>
+                                </div>
+                                <span class="review-date">${formatDateShort(review.created_at)}</span>
+                            </div>
+                            <p style="color: var(--text-gray);">${review.comment}</p>
+                            ${review.verified ? '<span class="badge badge-success"><i class="fas fa-check-circle"></i> Verified Purchase</span>' : ''}
+                        </div>
+                    `).join('');
+                }
+                
+                // Show review form if user is logged in and has purchased the product
+                const user = getCurrentUser();
+                const reviewFormSection = document.getElementById('reviewFormSection');
+                
+                if (user) {
+                    // Check if user has purchased this product
+                    const userOrders = await getUserOrders(user.email);
+                    const hasPurchased = userOrders.some(order => 
+                        order.status === 'delivered' && 
+                        order.products.some(p => p.productId === productId)
+                    );
+                    
+                    // Check if user has already reviewed
+                    const hasReviewed = reviews.some(r => r.userEmail === user.email);
+                    
+                    if (hasPurchased && !hasReviewed) {
+                        reviewFormSection.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+            }
+        }
+
+        function handleAddToCart() {
+            if (!currentProduct) return;
+            
+            if (addToCart(currentProduct)) {
+                // Optional: redirect to cart
+                // window.location.href = 'cart.html';
+            }
+        }
+
+        function buyNow() {
+            if (!currentProduct) return;
+            
+            addToCart(currentProduct);
+            window.location.href = 'checkout.html';
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            document.getElementById('rating').value = rating;
+            
+            // Update star display
+            const stars = document.querySelectorAll('[data-rating]');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+        }
+
+        async function handleReviewSubmit(e) {
+            e.preventDefault();
+            
+            const user = getCurrentUser();
+            if (!user) {
+                showAlert('Please log in to submit a review', 'warning');
+                return;
+            }
+            
+            const comment = document.getElementById('reviewComment').value;
+            const rating = parseInt(document.getElementById('rating').value);
+            
+            try {
+                const reviewData = {
+                    id: generateId(),
+                    productId: currentProduct.id,
+                    userId: user.id,
+                    userName: user.name,
+                    userEmail: user.email,
+                    rating: rating,
+                    comment: comment,
+                    verified: true
+                };
+                
+                await createReview(reviewData);
+                
+                showAlert('Review submitted successfully!', 'success');
+                
+                // Reload reviews
+                await loadReviews(currentProduct.id);
+                
+                // Reset form
+                document.getElementById('reviewForm').reset();
+                setRating(5);
+                
+                // Hide review form
+                document.getElementById('reviewFormSection').style.display = 'none';
+                
+                // Update product rating
+                updateProductRating(currentProduct.id);
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                showAlert('Failed to submit review. Please try again.', 'error');
+            }
+        }
+
+        async function updateProductRating(productId) {
+            try {
+                const reviews = await getProductReviews(productId);
+                const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+                
+                await updateProduct(productId, {
+                    rating: avgRating,
+                    reviewCount: reviews.length
+                });
+            } catch (error) {
+                console.error('Error updating product rating:', error);
+            }
+        }
+
+        function getStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+            let stars = '';
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+            
+            return stars;
+        }
+    </script>
+</body>
+</html>
